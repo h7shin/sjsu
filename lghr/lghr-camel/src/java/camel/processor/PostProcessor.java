@@ -7,8 +7,12 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import java.util.HashMap;
+import java.util.Map;
+
+
 /***
- *Created by Lin Cheng
+ *Created by Lin Cheng, modified by Hyunwook Shin
  */
 abstract class PostProcessor implements Processor {
 
@@ -28,7 +32,10 @@ abstract class PostProcessor implements Processor {
             String resp = handle();
 
             exchange.getOut().setBody(resp);
-            exchange.getOut().setHeader("Access-Control-Allow-Origin","*");
+            Map<String, Object> map = new HashMap();
+            map.put( "Access-Control-Allow-Origin","*" );
+            map.put( "Access-Control-Allow-Methods","*" );
+            exchange.getOut().setHeaders(map);
 
         } catch (Exception e) {
             e.printStackTrace();
