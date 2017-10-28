@@ -47,9 +47,19 @@ public class TwitterService extends CamelService {
     private String timelineUri = "timeline";
 
 
-    static TwitterService instance = new TwitterService();
+    static TwitterService instance = new TwitterService("lgjwlqVncQb8ZAy1EjdDRPIMJ",
+            "lzV68NbXKe6wK3vqhjmJOGxm6koGlxOD0mkUbSF8bdU4W5jsi6",
+            "904211533822955520-1bUicMh60bxTwu0NyOZHPHrNo5tRRDz",
+            "QKeebkymJpKXCIthgFNgy6LOKkbz3Y7mJsXE0bGQhWYuD");
 
     private TwitterService() {
+    }
+
+    public TwitterService(String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret) {
+        this.consumerKey = consumerKey;
+        this.consumerSecret = consumerSecret;
+        this.accessToken = accessToken;
+        this.accessTokenSecret = accessTokenSecret;
     }
 
     static public TwitterService instance(){
@@ -173,6 +183,14 @@ public class TwitterService extends CamelService {
                         .to("file:" + rootDir + "?fileExist=append&noop=true");
             }
         });
+    }
+
+    public static void main(String[] args){
+        try {
+            instance.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }
