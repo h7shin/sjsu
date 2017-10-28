@@ -28,6 +28,7 @@ abstract class PostProcessor implements Processor {
             String resp = handle();
 
             exchange.getOut().setBody(resp);
+            exchange.getOut().setHeader("Access-Control-Allow-Origin","*");
 
         } catch (Exception e) {
             e.printStackTrace();
