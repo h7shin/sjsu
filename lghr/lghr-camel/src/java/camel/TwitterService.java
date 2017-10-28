@@ -1,9 +1,6 @@
 package camel;
 
-import camel.processor.KeywordProcessor;
-import camel.processor.PeopleProcessor;
-import camel.processor.PrintProcessor;
-import camel.processor.TwitterProcessor;
+import camel.processor.*;
 import common.Utils;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
@@ -21,7 +18,7 @@ import java.io.File;
  search -> /lghr/camel_d/search.txt
  directmessage -> /lghr/camel_d/directmessage.txt
 
- REST APIs:
+ RESo APIs:
 
  GET:localhost:8000/twitter/timeline -> get twitters from current timeline
  GET:localhost:8000/twitter/msg -> get message (current user only)
@@ -48,6 +45,7 @@ public class TwitterService extends CamelService {
     private String searchUri = "search";
     private String directmessageUri = "directmessage";
     private String timelineUri = "timeline";
+
 
     static TwitterService instance = new TwitterService();
 
@@ -110,7 +108,8 @@ public class TwitterService extends CamelService {
                         .get("/msg").to("direct:msg")
                         .get("/search").to("direct:search")
                         .post("/keyword").to("direct:keyword")
-                        .post("/people").to("direct:people");
+                        .post("/people").to("direct:people")
+                        .post("/api").to("direct:server"); /* hyunwook shin */
 //                        .get("/testget").to("direct:testget")
 //                        .post("/testpost").to("direct:testpost");
 
@@ -124,6 +123,8 @@ public class TwitterService extends CamelService {
                         .process(new KeywordProcessor());
                 from("direct:people")
                         .process(new PeopleProcessor());
+                from("direct:server")
+                        .process(new ServerPostProcessor());
 
 //                from("direct:testget")
 //                        .process(new GetProcessor());

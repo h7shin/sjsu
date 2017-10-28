@@ -97,6 +97,19 @@
             <artifactId>camel-twitter</artifactId>
             <version>${camel.version}</version>
         </dependency>
+        <!-- hyunwook shin -->
+        <dependency>
+            <groupId>com.github.kevinsawicki</groupId>
+            <artifactId>http-request</artifactId>
+            <version>6.0</version>
+        <!-- hyunwook shin -->
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20170516</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-restlet </artifactId>
@@ -117,12 +130,12 @@
             <artifactId>camel-undertow</artifactId>
             <version>${camel.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
-            <version>4.0.3</version>
+            <version>4.0.6</version>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
