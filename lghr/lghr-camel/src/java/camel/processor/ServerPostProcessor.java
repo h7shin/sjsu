@@ -109,6 +109,10 @@ public class ServerPostProcessor extends  PostProcessor{
                 GeoQuery query = new GeoQuery(location);
                 response = placesToJson( twitter.searchPlaces( query ) );
                 break;
+            case "search":
+                Query tweetQuery = new Query( data.getString( "keyword" ) );
+                response = statusesToJson( twitter.search( tweetQuery ).getTweets());
+                break;
             case "favorites":
                 response = statusesToJson( twitter.getFavorites() );
                 break;
