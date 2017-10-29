@@ -13,10 +13,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class TwitterServiceTest {
 
-    TwitterService service = TwitterService.instance("A3r6vuJNqxRxWy7vvQYKvN3zY",
-            "AzNhDMJKs7xKNHV4sE58zfFpALLOOTfBi0dw2OStDrrxb9TBJ9",
-            "42130867-xhH261CGI62un52HGm66Iks2Xlw7OYaJijm3ucwVG",
-            "0TN0VWs6CFsYKFDHxKtZnmbIgaLMuIxI8Itl2vsHWyjwl");
+    String consumerKey = "lgjwlqVncQb8ZAy1EjdDRPIMJ";
+    String consumerSecret = "lzV68NbXKe6wK3vqhjmJOGxm6koGlxOD0mkUbSF8bdU4W5jsi6";
+    String accessToken = "904211533822955520-1bUicMh60bxTwu0NyOZHPHrNo5tRRDz";
+    String accessTokenSecret = "QKeebkymJpKXCIthgFNgy6LOKkbz3Y7mJsXE0bGQhWYuD";
+    TwitterService service = TwitterService.instance(
+            consumerKey, consumerSecret, accessToken, accessTokenSecret );
 
     @Test
     //put everything here since they should be in the same instance
