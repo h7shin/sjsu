@@ -29,7 +29,7 @@ public class TwitterServiceTest {
         JSONObject info = new JSONObject( helper.stringToJson( "hello") );
         assertEquals( info.getString("value"), "hello" );
         System.out.println("stringToJson passed");
-        info = new JSONObject( helper.stringToJson( "iserror") );
+        info = new JSONObject( helper.errorToJson( "iserror") );
         assertEquals( info.getString("error"), "iserror" );
         System.out.println("errorToJson passed");
     }
