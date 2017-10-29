@@ -40,15 +40,19 @@ public class ServerPostProcessor extends  PostProcessor{
         info.put( "error", "" );
         return info.toString();
     }
-    String idsToJson(IDs ids) {
+    String usersToJson(List<User> users) {
         JSONObject info = new JSONObject();
-        JSONObject tweetInfo = new JSONObject();
-        long[] idList = ids.getIDs();
-        for ( int i = 0; i < idList.length; i++) {
-            tweetInfo.put(String.valueOf(i), idList[i] );
+        JSONObject usersInfo = new JSONObject();
+        for ( int i = 0; i < users.size(); i++) {
+            JSONObject userinfo = new JSONObject();
+            userinfo.put( "email", users.get(i).getEmail());
+            userinfo.put( "id", users.get(i).getId());
+            userinfo.put( "location", users.get(i).getLocation());
+            userinfo.put( "profilePic", users.get(i).getBiggerProfileImageURL());
+            usersInfo.put( users.get(i).getScreenName(), userinfo );
         }
         info.put( "error", "" );
-        info.put( "value", tweetInfo );
+        info.put( "value", usersInfo );
         return info.toString();
     }
 
@@ -122,7 +126,7 @@ public class ServerPostProcessor extends  PostProcessor{
             case "friends":
                 try {
                     String name = twitter.getAccountSettings().getScreenName();
-                    response = idsToJson(twitter.getFriendsIDs( name, -1 ));
+                    response = usersToJson(twitter.getFriendsList( name, -1 ));
                 } catch (Exception e) {
                     response = errorToJson( e.toString() );
                 }
