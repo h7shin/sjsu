@@ -8,7 +8,7 @@ import org.apache.camel.model.rest.RestBindingMode;
 import java.io.File;
 
 /**
- * Created by Lin Cheng on 2017/9/25.
+ * Created by Lin Cheng on 2017/9/25. and modified by Hyunwook Shin
  *
  This service will pull Twitter contents and put them to local file system.
 
@@ -18,13 +18,31 @@ import java.io.File;
  search -> /lghr/camel_d/search.txt
  directmessage -> /lghr/camel_d/directmessage.txt
 
- RESo APIs:
+ REST APIs:
 
  GET:localhost:8000/twitter/timeline -> get twitters from current timeline
  GET:localhost:8000/twitter/msg -> get message (current user only)
  GET:localhost:8000/twitter/search -> get search results using the current keyword
  POST:localhost:8000/twitter/keyword -> set new search keyword
  POST:localhost:8000/twitter/people -> set new people's timeline
+ POST:localhost:8000/twitter/api -> five other apis depending on "action" field.
+    Input data must be in JSON format:
+       { "action": <action>,
+         "credentials" : {
+            "accessToken" : <access-token>,
+            "accessTokenKey" : <access-token-key>
+         }
+         "data" : <data>
+       }
+    The POST request will return in JSON format:
+       { "error" : <error>,
+         "value" : <result> }
+    action             description
+     - search             get tweets from the user
+     - nearby             get locations nearby GPS coordinates
+     - favorites          get tweets liked by the user
+     - account            get screen name
+     - friends            get information (email,profileurl,name) for each friend
  */
 public class TwitterService extends CamelService {
 
@@ -113,7 +131,7 @@ public class TwitterService extends CamelService {
             @Override
             public void configure() throws Exception {
                 restConfiguration().component("restlet").host("localhost").port(8000).bindingMode(RestBindingMode.auto);
-                rest("/twitter")
+                rest("/twitter").enableCORS(true)
                         .get("/timeline").to("direct:timeline")
                         .get("/msg").to("direct:msg")
                         .get("/search").to("direct:search")
