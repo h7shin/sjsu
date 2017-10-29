@@ -91,6 +91,12 @@ public class ServerPostProcessor extends  PostProcessor{
         JSONObject info = new JSONObject(body);
         JSONObject data = info.getJSONObject("data");
 
+        String action = info.getString("action");
+        String response;
+        System.out.println( body );
+        System.out.println( "action is " + action );
+        System.out.println( "data is " + data.toString() );
+
         /* Get the credentials from "credentials" */
         try {
             JSONObject credentials = info.getJSONObject( "credentials" );
@@ -102,10 +108,6 @@ public class ServerPostProcessor extends  PostProcessor{
 
         Twitter twitter = twitterHandle( consumerKey, consumerSecret, accessToken, accessTokenSecret );
 
-        String action = info.getString("action");
-        String response;
-        System.out.println( "action is " + action );
-        System.out.println( "data is " + data.toString() );
         body = "";
         double SanJoseLatitude = 37.3382;
         double SanJoseLongitude = -121.8863;
