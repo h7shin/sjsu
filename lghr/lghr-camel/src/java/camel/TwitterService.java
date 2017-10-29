@@ -41,8 +41,14 @@ import java.io.File;
      - search             get tweets from the user
      - nearby             get locations nearby GPS coordinates
      - favorites          get tweets liked by the user
+     - timeline           get tweets on home timeline
      - account            get screen name
-     - friends            get information (email,profileurl,name) for each friend
+     - friends            get information (email,id,name) for each friend
+     - followers          get information (email,id,name) for each follower
+     - tweet              post a new tweet
+     - retweet            retweet other user's tweet
+     - unfollow           unfollow an user
+     - follow             follow an user
  */
 public class TwitterService extends CamelService {
 
