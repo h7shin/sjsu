@@ -12,74 +12,6 @@ import java.util.List;
  *Created by Hyunwook Shin
  */
 public class ServerPostProcessor extends  PostProcessor{
-    String placesToJson( List<Place> places ) {
-        JSONObject info = new JSONObject();
-        JSONObject placesInfo = new JSONObject();
-        for ( int i = 0; i < places.size(); i++) {
-            JSONObject placeInfo = new JSONObject();
-            placeInfo.put("country", places.get(i).getCountry());
-            placeInfo.put("name", places.get(i).getName());
-            placeInfo.put("type", places.get(i).getPlaceType());
-            placesInfo.put(String.valueOf(i), placeInfo);
-        }
-        info.put( "error", "" );
-        info.put( "value", placesInfo );
-        return info.toString();
-    }
-
-    String errorToJson(String error) {
-        JSONObject info = new JSONObject();
-        info.put( "error", error );
-        info.put( "value", "" );
-        return info.toString();
-    }
-
-    String stringToJson(String x) {
-        JSONObject info = new JSONObject();
-        info.put( "value", x );
-        info.put( "error", "" );
-        return info.toString();
-    }
-    String usersToJson(List<User> users) {
-        JSONObject info = new JSONObject();
-        JSONObject usersInfo = new JSONObject();
-        for ( int i = 0; i < users.size(); i++) {
-            JSONObject userinfo = new JSONObject();
-            userinfo.put( "email", users.get(i).getEmail());
-            userinfo.put( "id", users.get(i).getId());
-            userinfo.put( "location", users.get(i).getLocation());
-            userinfo.put( "profilePic", users.get(i).getBiggerProfileImageURL());
-            usersInfo.put( users.get(i).getScreenName(), userinfo );
-        }
-        info.put( "error", "" );
-        info.put( "value", usersInfo );
-        return info.toString();
-    }
-
-    String statusToJson(Status status) {
-        JSONObject info = new JSONObject();
-        JSONObject tweetInfo = new JSONObject();
-        tweetInfo.put( "id", status.getId() );
-        tweetInfo.put( "text", status.getText() );
-        tweetInfo.put( status.getUser().getScreenName(), tweetInfo );
-        info.put( "error", "" );
-        info.put( "value", tweetInfo );
-        return info.toString();
-    }
-
-    String statusesToJson(List<Status> statuses) {
-        JSONObject info = new JSONObject();
-        JSONObject tweetsInfo = new JSONObject();
-        for ( Status status : statuses) {
-            JSONObject tweetInfo = new JSONObject();
-            tweetInfo.put( "id", status.getId() );
-            tweetInfo.put( "text", status.getText() );
-            tweetsInfo.put( status.getUser().getScreenName(), tweetInfo );
-        }
-        info.put( "error", "" );
-        info.put( "value", tweetsInfo );
-        return info.toString();
-    }
 
     Twitter twitterHandle( String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret ) {
         ConfigurationBuilder builder = new ConfigurationBuilder();
@@ -102,6 +34,7 @@ public class ServerPostProcessor extends  PostProcessor{
         String consumerSecret = "lzV68NbXKe6wK3vqhjmJOGxm6koGlxOD0mkUbSF8bdU4W5jsi6";
         String accessToken;
         String accessTokenSecret;
+        JsonHelper helper = new JsonHelper();
         JSONObject info = new JSONObject(body);
         JSONObject data = info.getJSONObject("data");
 
@@ -118,7 +51,7 @@ public class ServerPostProcessor extends  PostProcessor{
             accessToken = credentials.getString( "accessToken" );
             accessTokenSecret = credentials.getString( "accessTokenSecret");
         } catch (Exception e) {
-            return errorToJson( "Invalid authentication format or invalid keys: " + e.toString() );
+            return helper.errorToJson( "Invalid authentication format or invalid keys: " + e.toString() );
         }
 
         Twitter twitter = twitterHandle( consumerKey, consumerSecret, accessToken, accessTokenSecret );
@@ -139,50 +72,50 @@ public class ServerPostProcessor extends  PostProcessor{
                     }
                     GeoLocation location = new GeoLocation(latitude, longitude);
                     GeoQuery query = new GeoQuery(location);
-                    response = placesToJson( twitter.searchPlaces( query ) );
+                    response = helper.placesToJson( twitter.searchPlaces( query ) );
                     break;
                 case "tweet":
                     twitter.updateStatus( data.getString( "status" ));
-                    response = stringToJson( "updated" );
+                    response = helper.stringToJson( "updated" );
                     break;
                 case "retweet":
                     twitter.retweetStatus( data.getLong( "id"));
-                    response = stringToJson("retweeted");
+                    response = helper.stringToJson("retweeted");
                     break;
                 case "search":
                     Query tweetQuery = new Query( data.getString( "keyword" ) );
-                    response = statusesToJson( twitter.search( tweetQuery ).getTweets());
+                    response = helper.statusesToJson( twitter.search( tweetQuery ).getTweets());
                     break;
                 case "favorites":
-                    response = statusesToJson( twitter.getFavorites() );
+                    response = helper.statusesToJson( twitter.getFavorites() );
                     break;
                 case "timeline":
-                    response = statusesToJson( twitter.getHomeTimeline() );
+                    response = helper.statusesToJson( twitter.getHomeTimeline() );
                     break;
                 case "name":
-                    response = stringToJson( twitter.getAccountSettings().getScreenName());
+                    response = helper.stringToJson( twitter.getAccountSettings().getScreenName());
                     break;
                 case "follow":
                     twitter.createFriendship(data.getString( "user" ));
-                    response = stringToJson("now following");
+                    response = helper.stringToJson("now following");
                     break;
                 case "unfollow":
                     twitter.destroyFriendship(data.getString( "user" ));
-                    response = stringToJson("unfollowing");
+                    response = helper.stringToJson("unfollowing");
                     break;
                 case "friends":
                     name = twitter.getAccountSettings().getScreenName();
-                    response = usersToJson(twitter.getFriendsList( name, -1 ));
+                    response = helper.usersToJson(twitter.getFriendsList( name, -1 ));
                     break;
                 case "followers":
                     name = twitter.getAccountSettings().getScreenName();
-                    response = usersToJson(twitter.getFollowersList( name, -1 ));
+                    response = helper.usersToJson(twitter.getFollowersList( name, -1 ));
                     break;
                 default:
-                    response = errorToJson("improper action");
+                    response = helper.errorToJson("improper action");
             }
         } catch (Exception e) {
-            response = errorToJson( e.toString() );
+            response = helper.errorToJson( e.toString() );
         }
         return response;
     }
