@@ -56,14 +56,28 @@ public class ServerPostProcessor extends  PostProcessor{
         return info.toString();
     }
 
-    String statusesToJson(List<Status> statuses) {
+    String statusToJson(Status status) {
         JSONObject info = new JSONObject();
         JSONObject tweetInfo = new JSONObject();
-        for ( Status status : statuses) {
-            tweetInfo.put( status.getUser().getScreenName(), status.getText() );
-        }
+        tweetInfo.put( "id", status.getId() );
+        tweetInfo.put( "text", status.getText() );
+        tweetInfo.put( status.getUser().getScreenName(), tweetInfo );
         info.put( "error", "" );
         info.put( "value", tweetInfo );
+        return info.toString();
+    }
+
+    String statusesToJson(List<Status> statuses) {
+        JSONObject info = new JSONObject();
+        JSONObject tweetsInfo = new JSONObject();
+        for ( Status status : statuses) {
+            JSONObject tweetInfo = new JSONObject();
+            tweetInfo.put( "id", status.getId() );
+            tweetInfo.put( "text", status.getText() );
+            tweetsInfo.put( status.getUser().getScreenName(), tweetInfo );
+        }
+        info.put( "error", "" );
+        info.put( "value", tweetsInfo );
         return info.toString();
     }
 
@@ -93,6 +107,7 @@ public class ServerPostProcessor extends  PostProcessor{
 
         String action = info.getString("action");
         String response;
+        String name; // username
         System.out.println( body );
         System.out.println( "action is " + action );
         System.out.println( "data is " + data.toString() );
@@ -112,39 +127,62 @@ public class ServerPostProcessor extends  PostProcessor{
         double SanJoseLatitude = 37.3382;
         double SanJoseLongitude = -121.8863;
         double latitude, longitude;
-        switch (action) {
-            case "nearby":
-                try {
-                    latitude = data.getDouble("latitude");
-                    longitude = data.getDouble("longitude");
-                } catch (Exception e){
-                    latitude = SanJoseLatitude;
-                    longitude = SanJoseLongitude;
-                }
-                GeoLocation location = new GeoLocation(latitude, longitude);
-                GeoQuery query = new GeoQuery(location);
-                response = placesToJson( twitter.searchPlaces( query ) );
-                break;
-            case "search":
-                Query tweetQuery = new Query( data.getString( "keyword" ) );
-                response = statusesToJson( twitter.search( tweetQuery ).getTweets());
-                break;
-            case "favorites":
-                response = statusesToJson( twitter.getFavorites() );
-                break;
-            case "name":
-                response = stringToJson( twitter.getAccountSettings().getScreenName());
-                break;
-            case "friends":
-                try {
-                    String name = twitter.getAccountSettings().getScreenName();
+        try {
+            switch (action) {
+                case "nearby":
+                    try {
+                        latitude = data.getDouble("latitude");
+                        longitude = data.getDouble("longitude");
+                    } catch (Exception e){
+                        latitude = SanJoseLatitude;
+                        longitude = SanJoseLongitude;
+                    }
+                    GeoLocation location = new GeoLocation(latitude, longitude);
+                    GeoQuery query = new GeoQuery(location);
+                    response = placesToJson( twitter.searchPlaces( query ) );
+                    break;
+                case "tweet":
+                    twitter.updateStatus( data.getString( "status" ));
+                    response = stringToJson( "updated" );
+                    break;
+                case "retweet":
+                    twitter.retweetStatus( data.getLong( "id"));
+                    response = stringToJson("retweeted");
+                    break;
+                case "search":
+                    Query tweetQuery = new Query( data.getString( "keyword" ) );
+                    response = statusesToJson( twitter.search( tweetQuery ).getTweets());
+                    break;
+                case "favorites":
+                    response = statusesToJson( twitter.getFavorites() );
+                    break;
+                case "timeline":
+                    response = statusesToJson( twitter.getHomeTimeline() );
+                    break;
+                case "name":
+                    response = stringToJson( twitter.getAccountSettings().getScreenName());
+                    break;
+                case "follow":
+                    twitter.createFriendship(data.getString( "user" ));
+                    response = stringToJson("now following");
+                    break;
+                case "unfollow":
+                    twitter.destroyFriendship(data.getString( "user" ));
+                    response = stringToJson("unfollowing");
+                    break;
+                case "friends":
+                    name = twitter.getAccountSettings().getScreenName();
                     response = usersToJson(twitter.getFriendsList( name, -1 ));
-                } catch (Exception e) {
-                    response = errorToJson( e.toString() );
-                }
-                break;
-            default:
-                response = errorToJson("improper action");
+                    break;
+                case "followers":
+                    name = twitter.getAccountSettings().getScreenName();
+                    response = usersToJson(twitter.getFollowersList( name, -1 ));
+                    break;
+                default:
+                    response = errorToJson("improper action");
+            }
+        } catch (Exception e) {
+            response = errorToJson( e.toString() );
         }
         return response;
     }
