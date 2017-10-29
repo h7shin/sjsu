@@ -86,12 +86,22 @@ public class ServerPostProcessor extends  PostProcessor{
          */
         String consumerKey = "lgjwlqVncQb8ZAy1EjdDRPIMJ";
         String consumerSecret = "lzV68NbXKe6wK3vqhjmJOGxm6koGlxOD0mkUbSF8bdU4W5jsi6";
-        String accessToken = "904211533822955520-1bUicMh60bxTwu0NyOZHPHrNo5tRRDz";
-        String accessTokenSecret = "QKeebkymJpKXCIthgFNgy6LOKkbz3Y7mJsXE0bGQhWYuD";
-        Twitter twitter = twitterHandle( consumerKey, consumerSecret, accessToken, accessTokenSecret );
-        System.out.println( "Body is '" + body + "'");
+        String accessToken;
+        String accessTokenSecret;
         JSONObject info = new JSONObject(body);
         JSONObject data = info.getJSONObject("data");
+
+        /* Get the credentials from "credentials" */
+        try {
+            JSONObject credentials = info.getJSONObject( "credentials" );
+            accessToken = credentials.getString( "accessToken" );
+            accessTokenSecret = credentials.getString( "accessTokenSecret");
+        } catch (Exception e) {
+            return errorToJson( "Invalid authentication format or invalid keys: " + e.toString() );
+        }
+
+        Twitter twitter = twitterHandle( consumerKey, consumerSecret, accessToken, accessTokenSecret );
+
         String action = info.getString("action");
         String response;
         System.out.println( "action is " + action );
