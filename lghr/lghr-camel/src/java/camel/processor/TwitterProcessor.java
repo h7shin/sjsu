@@ -1,5 +1,6 @@
 package camel.processor;
 
+import common.JsonHelper;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import twitter4j.DirectMessage;
@@ -26,13 +27,13 @@ public class TwitterProcessor implements Processor {
         String content;
         if(obj instanceof Status) {
             Status status = (Status)obj;
-            content = status.getText();
+            content = JsonHelper.toJson(status);
         } else if(obj instanceof List) {
             List<Status> ss = (List<Status>)obj;
-            content = ss.stream().map(o->o.getText()).collect(Collectors.joining("###"));
+            content = ss.stream().map(o->JsonHelper.toJson(o)).collect(Collectors.joining("###"));
         } else if(obj instanceof DirectMessage){
             DirectMessage msg = (DirectMessage)obj;
-            content = msg.getText();
+            content = JsonHelper.toJson(msg);
         } else {
             content = obj + "";
         }
